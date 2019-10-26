@@ -46,7 +46,7 @@ def log(action, verbose):
     elif action == "LOAD":
         loads += 1
     if verbose:
-        print action
+        print (action)
 
 # Printing stats
 def print_stats(time_elapsed):
@@ -57,16 +57,16 @@ def print_stats(time_elapsed):
     global successful_deletes
     global failed_deletes
     global loads  
-    print "------------------------------------"
-    print "PUTS", puts
-    print "SUCCESFUL_GETS", successful_gets
-    print "FAILED_GETS", failed_gets
-    print "RANGES", ranges
-    print "SUCCESSFUL_DELS", successful_deletes
-    print "FAILED_DELS", failed_deletes
-    print "LOADS", loads
-    print "TIME_ELAPSED", time_elapsed
-    print "------------------------------------"
+    print ("------------------------------------")
+    print ("PUTS", puts)
+    print ("SUCCESFUL_GETS", successful_gets)
+    print ("FAILED_GETS", failed_gets)
+    print ("RANGES", ranges)
+    print ("SUCCESSFUL_DELS", successful_deletes)
+    print ("FAILED_DELS", failed_deletes)
+    print ("LOADS", loads)
+    print ("TIME_ELAPSED", time_elapsed)
+    print ("------------------------------------")
 
 # ------------------------------------------------
 #                   Main function
@@ -97,11 +97,11 @@ if __name__ == "__main__":
                 try:
                     val = db[key]
                     if show_output:
-                        print val
+                        print (val)
                     log("SUCCESFUL_GET", verbose)
                 except:
                     if show_output:
-                        print ""
+                        print ("")
                     log("FAILED_GET", verbose)
             # RANGE
             if line[0] == "r":
@@ -113,7 +113,7 @@ if __name__ == "__main__":
                 valid_vals = map(lambda x: db[x], valid_keys)
                 res = zip(valid_keys, valid_vals)
                 if show_output:
-                    print " ".join(map(lambda x: str(x[0])+":"+str(x[1]), res))
+                    print (" ".join(map(lambda x: str(x[0])+":"+str(x[1]), res)))
                 log("RANGE", verbose)
             # DELETE
             if line[0] == "d":

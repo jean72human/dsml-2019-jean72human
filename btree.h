@@ -110,12 +110,12 @@ void print_tree(struct node * root){
     if (root == NULL)
     {
         printf("NULL");
-    } 
-    else 
+    }
+    else
     {
         _print(root);
     }
-        
+
     printf("\n");
 }
 
@@ -172,10 +172,10 @@ int _print_value_from_leaf(int key, struct node * leaf){
     int the_key = 0;
 
     if(leaf == NULL)
-    return NULL;
+    return 0;
 
     if (!leaf->isleaf){
-        return NULL;
+        return 0;
     }
     while ( i < leaf->nvals){
         the_key = leaf->keys[i];
@@ -185,11 +185,11 @@ int _print_value_from_leaf(int key, struct node * leaf){
             if (key == the_key){
                 return leaf->values[i];
             } else {
-            return NULL;
+            return 0;
             }
         }
     }
-    return NULL;
+    return 0;
 }
 
 int find(int key, struct node * rootnode){
@@ -264,8 +264,8 @@ void insert_node_in_node(struct node * parent, struct node * node, int key) {
 	*temp = *node;
 }
 
-void insert_in_parent(struct node * p, struct node * node1, struct node * node2, int k){
-    
+void insert_in_parent(struct node * p, struct node * node1, struct node * node2){
+
     if (p->parent == NULL){
         if (p->nvals < (CUT * FANOUT - 1)){
             insert_node_in_node(p, node1, node1->keys[0]);
@@ -314,8 +314,6 @@ void insert_in_parent(struct node * p, struct node * node1, struct node * node2,
             temp ++;
             insert_node_in_node(&p2, temp, temp->keys[0]);
         }
-        
-        int newk = p1.keys[0];
 
         p1.parent = p->parent;
         p2.parent = p->parent;
@@ -323,7 +321,7 @@ void insert_in_parent(struct node * p, struct node * node1, struct node * node2,
         insert_node_in_node(&p2, node1, node1->keys[0]);
         insert_node_in_node(&p2, node2, node2->keys[0]);
 
-        insert_in_parent(p->parent, &p1, &p2, newk);
+        insert_in_parent(p->parent, &p1, &p2);
     }
 }
 
@@ -353,10 +351,9 @@ void insert(struct node * rootnode, int key, int value){
             insert_in_leaf(&n2, leaf->keys[i], leaf->values[i]);
         }
         insert_in_leaf(&n2, key, value);
-        int k = n1.keys[0];
         n1.parent = leaf->parent;
         n2.parent = leaf->parent;
-        insert_in_parent(leaf->parent,&n1, &n2, k);
+        insert_in_parent(leaf->parent,&n1, &n2);
     }
 }
 

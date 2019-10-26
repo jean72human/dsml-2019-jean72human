@@ -54,8 +54,10 @@ int wrapperGet(STORAGECXT_t **storageEngine, KEY_t targetKey, VAL_t *foundVal){
     (void) targetKey;
     (void) foundVal;
 
-    int value = find(targetKey, storageEngine->tree);
-    if (value != NULL){
+    STORAGECXT_t * engine = *storageEngine;
+
+    int value = find(targetKey, engine->tree);
+    if  (value){
         *foundVal = value;
         return 1;
     }
@@ -87,8 +89,10 @@ int wrapperPut(STORAGECXT_t **storageEngine, KEY_t key, VAL_t val){
     (void) key;
     (void) val;
 
-    insert(storageEngine->tree, key, val);
-    if ( find(key, storageEngine->tree) == val)
+    STORAGECXT_t * engine = *storageEngine;
+
+    insert(engine->tree, key, val);
+    if ( find(key, engine->tree) == val)
         return 1;
     
     return 0;
