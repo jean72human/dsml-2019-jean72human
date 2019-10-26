@@ -35,7 +35,7 @@ What is the minimum threshold of content for a node, before it has to be part of
 
 #define INTSIZE sizeof(int)
 #define FANOUT 10000
-#define CUT 0.95
+#define CUT 0.95 // proportion of a node space that should be full before splitting
 
 typedef struct node {
 	int * keys;
@@ -45,6 +45,7 @@ typedef struct node {
 	struct node * next; 
     bool isleaf;
 } node;
+
 
 struct node create_leaf(){
     struct node leaf;
@@ -79,8 +80,7 @@ struct node create_root(){
 }
 
 
-
-
+///// PRINT FUCTIONS THAT WERE USED WHEN DEBUGGING
 void _print_empty(){
     for(int i=0;i<FANOUT;i++){
         printf(" | | ");
@@ -136,6 +136,7 @@ How many nodes need to be accessed during an equality search for a key, within t
 
 
 
+//Finds a leaf corresponding to an index (wheter the index is in the leaf or not)
 struct node * _find_leaf(int key, struct node * rootnode){
     int the_key = 0;
     int i = 0;
@@ -167,6 +168,8 @@ struct node * _find_leaf(int key, struct node * rootnode){
     return _find_leaf(key, rootnode->next + i);
 }
 
+
+//takes in a leaf and a key and returns the value at that key 
 int _print_value_from_leaf(int key, struct node * leaf){
     int i = 0;
     int the_key = 0;
@@ -192,6 +195,8 @@ int _print_value_from_leaf(int key, struct node * leaf){
     return 0;
 }
 
+
+//main find function
 int find(int key, struct node * rootnode){
     return _print_value_from_leaf(key, _find_leaf(key, rootnode));
 }
@@ -208,6 +213,7 @@ For Splitting B+Tree Nodes (Chapter 10.8.3)
 // TODO: here you will need to define INSERT related method(s) of adding key-values in your B+Tree.
 
 
+//takes in a leaf and inserts a key value pair
 void insert_in_leaf(struct node * leaf, int key, int value) {
 	int i;
 	int the_key = 0;
@@ -227,6 +233,7 @@ void insert_in_leaf(struct node * leaf, int key, int value) {
 	leaf->nvals++;
 }
 
+// insert a node inside another node (used when splitting)
 void insert_node_in_node(struct node * parent, struct node * node, int key) {
 	int i = 0;
 	int the_key = 0;
@@ -234,7 +241,7 @@ void insert_node_in_node(struct node * parent, struct node * node, int key) {
 
     node->parent = parent;
 
-    
+    // finds where to insert
 	while (the_key < parent->nvals ){
         if (parent->keys[the_key] <= key){
             if (parent->keys[the_key] == key){
@@ -264,14 +271,14 @@ void insert_node_in_node(struct node * parent, struct node * node, int key) {
 	*temp = *node;
 }
 
-void insert_in_parent(struct node * p, struct node * node1, struct node * node2){
+int insert_in_parent(struct node * p, struct node * node1, struct node * node2){
 
     if (p->parent == NULL){
         if (p->nvals < (CUT * FANOUT - 1)){
             insert_node_in_node(p, node1, node1->keys[0]);
             insert_node_in_node(p, node2, node2->keys[0]);
             
-            return ;
+            return 1;
         } else {
             struct node r = create_root();
             struct node temp;
@@ -290,13 +297,14 @@ void insert_in_parent(struct node * p, struct node * node1, struct node * node2)
                 struct node * temp = p->next;
                 temp+=i;
             }
-            return ;
+            return 1;
 
         }
     }
     if (p->nvals < (CUT * FANOUT - 1)){
         insert_node_in_node(p, node1, node1->keys[0]);
         insert_node_in_node(p, node2, node2->keys[0]);
+	return 1;
     } else {
         
         struct node p1 = create_root();
@@ -322,7 +330,11 @@ void insert_in_parent(struct node * p, struct node * node1, struct node * node2)
         insert_node_in_node(&p2, node2, node2->keys[0]);
 
         insert_in_parent(p->parent, &p1, &p2);
+	
+	return 1;
     }
+
+    return 0;
 }
 
 

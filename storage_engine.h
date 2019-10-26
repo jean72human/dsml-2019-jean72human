@@ -91,11 +91,7 @@ int wrapperPut(STORAGECXT_t **storageEngine, KEY_t key, VAL_t val){
 
     STORAGECXT_t * engine = *storageEngine;
 
-    insert(engine->tree, key, val);
-    if ( find(key, engine->tree) == val)
-        return 1;
-    
-    return 0;
+    return insert(engine->tree, key, val);
 }
 
 /*
