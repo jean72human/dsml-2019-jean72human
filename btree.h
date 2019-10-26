@@ -34,8 +34,8 @@ What is the minimum threshold of content for a node, before it has to be part of
 
 
 #define INTSIZE sizeof(int)
-#define FANOUT 7
-#define CUT 0.6
+#define FANOUT 10000
+#define CUT 0.95
 
 typedef struct node {
 	int * keys;
@@ -104,29 +104,6 @@ void _print(struct node * node){
 }
 
 
-struct node ** _print_tree_children(struct node * node){
-    struct node ** level = malloc(sizeof(struct node) * FANOUT);
-
-    if (node){    
-        for (int i=0;i<FANOUT;i++){
-            if (node->next + i){
-                level[i] = node->next + i;
-            }
-            _print(node->next + i);
-        }
-        printf("\n\n");
-    }
-    return level;
-}
-
-void _print_level(struct node ** level){
-    for (int i=0;i<FANOUT;i++){
-        if (level[i]){
-            _print_level(_print_tree_children(level[i]));
-            printf("\n\n");
-        }
-    }
-}
 
 
 void print_tree(struct node * root){
@@ -140,7 +117,6 @@ void print_tree(struct node * root){
     }
         
     printf("\n");
-    //_print_level(_print_tree_children(root));
 }
 
 
@@ -163,12 +139,8 @@ How many nodes need to be accessed during an equality search for a key, within t
 struct node * _find_leaf(int key, struct node * rootnode){
     int the_key = 0;
     int i = 0;
-    //printf("Finding the leaf\n");
-    //print_tree(rootnode);
 
     if (rootnode->isleaf){
-        //print_tree(rootnode);
-        //printf("Values: %d\n",rootnode->nvals);
         return rootnode;
     }
 
@@ -189,10 +161,8 @@ struct node * _find_leaf(int key, struct node * rootnode){
             break;
         }
     }
-    //printf("this is the i:%d\n",i);
     if (i>=rootnode->nvals)
     return NULL;
-    //printf("The key is:%d\n\n",rootnode->keys[i]);
     
     return _find_leaf(key, rootnode->next + i);
 }
@@ -205,7 +175,6 @@ int _print_value_from_leaf(int key, struct node * leaf){
     return NULL;
 
     if (!leaf->isleaf){
-        //printf("Not a leaf, error\n");
         return NULL;
     }
     while ( i < leaf->nvals){
@@ -224,12 +193,7 @@ int _print_value_from_leaf(int key, struct node * leaf){
 }
 
 int find(int key, struct node * rootnode){
-    int value = _print_value_from_leaf(key, _find_leaf(key, rootnode));
-    if (value == NULL){
-        printf("Not found\n");
-        return NULL;
-    }
-    return value;
+    return _print_value_from_leaf(key, _find_leaf(key, rootnode));
 }
 
 
@@ -304,16 +268,11 @@ void insert_in_parent(struct node * p, struct node * node1, struct node * node2,
     
     if (p->parent == NULL){
         if (p->nvals < (CUT * FANOUT - 1)){
-            printf("Maybe here?\n");
-            print_tree(p);
-            print_tree(node1);
-            print_tree(node2);
             insert_node_in_node(p, node1, node1->keys[0]);
             insert_node_in_node(p, node2, node2->keys[0]);
             
             return ;
         } else {
-            printf("Is it here?\n");
             struct node r = create_root();
             struct node temp;
             
@@ -336,12 +295,10 @@ void insert_in_parent(struct node * p, struct node * node1, struct node * node2,
         }
     }
     if (p->nvals < (CUT * FANOUT - 1)){
-        printf("Or here?\n");
-
         insert_node_in_node(p, node1, node1->keys[0]);
         insert_node_in_node(p, node2, node2->keys[0]);
     } else {
-        printf("Here rather?\n");
+        
         struct node p1 = create_root();
         struct node p2 = create_root();
         
@@ -384,11 +341,9 @@ void insert(struct node * rootnode, int key, int value){
     if (leaf->nvals < CUT * FANOUT){
         insert_in_leaf(leaf, key, value);
     } else {
-        printf("Finallly oooo it's about to go down\n");
         // split leaf node
         struct node n1 = create_leaf();
         struct node n2 = create_leaf();
-        printf("Got here\n");
 
         int half = 0.5*leaf->nvals;
         for (int i=0; i<half; i++){
@@ -402,8 +357,6 @@ void insert(struct node * rootnode, int key, int value){
         n1.parent = leaf->parent;
         n2.parent = leaf->parent;
         insert_in_parent(leaf->parent,&n1, &n2, k);
-
-        //free(leaf);
     }
 }
 
